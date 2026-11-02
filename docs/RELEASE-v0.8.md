@@ -105,5 +105,5 @@ Mesa/Turnip은 그래픽을 그리는 드라이버입니다. 드라이버를 추
 | --- | ---: | --- |
 | `Spikeout-Battle-Street-Kr-Patcher-v0.8.exe` | 12,332,978 | `8030a3bcdbea8eb4c70619907f93ddefe13d6680f592fbf6e16b49efc90bee75` |
 | `hakuX-Spikeout-KR-1.3.0-v0.8.apk` | 26,131,277 | `6b14789f28d90cbf1f81d81559ac5d43f066b2ebad0f6b053fb79fd0cba69e14` |
-| `hakuX-Spikeout-KR-source-v0.8.zip` | 113,572,590 | `4ec6896f46bb0e43da895f8a0772cc41cbf93079306d03e330f9b2325f3310ce` |
+| `hakuX-Spikeout-KR-source-v0.8.zip` | 113,560,590 | `b9bfc9d9b4012cba1b6051b6452e4ff70e88046572953e316152c6e96f8204c6` |
 

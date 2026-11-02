@@ -1,0 +1,147 @@
+diff --git a/android/app/build.gradle.kts b/android/app/build.gradle.kts
+index 6d3022c1f4c5fa239f3aabf9e66a5b013a0634f5..ce176faa87d88f52dbddd1db5a63c58c0e3c1373 100644
+--- a/android/app/build.gradle.kts
++++ b/android/app/build.gradle.kts
+@@ -24,14 +24,15 @@ android {
+   namespace = "com.rfandango.haku_x"
+   compileSdk = 36
+   buildToolsVersion = "36.1.0"
+-  ndkVersion = "29.0.14206865"
++  ndkVersion = providers.gradleProperty("spikeout.ndkVersion").orElse("29.0.14206865").get()
++  providers.gradleProperty("spikeout.ndkPath").orNull?.let { ndkPath = it }
+ 
+   defaultConfig {
+     applicationId = "com.rfandango.haku_x"
+     minSdk = 28
+     targetSdk = 36
+ 
+-    versionCode = 9
++    versionCode = 10
+     versionName = "1.3.0"
+ 
+     ndk {
+@@ -56,8 +57,9 @@ android {
+ 
+   buildTypes {
+     debug {
+-      applicationIdSuffix = ".debug"
+-      resValue("string", "app_name", "hakuX Debug")
++      applicationIdSuffix = ".spikeoutqa"
++      versionNameSuffix = "-spikeout-kr-v0.8"
++      resValue("string", "app_name", "hakuX Spikeout KR")
+       ndk {
+         debugSymbolLevel = "NONE"
+       }
+diff --git a/android/app/src/main/java/com/rfandango/haku_x/GpuDriverHelper.kt b/android/app/src/main/java/com/rfandango/haku_x/GpuDriverHelper.kt
+index c9808fa846055fd8f7087ce9a5fabcd7293421e9..fe91938817f1f794da1d80ed75e1de215c8b9bf8 100644
+--- a/android/app/src/main/java/com/rfandango/haku_x/GpuDriverHelper.kt
++++ b/android/app/src/main/java/com/rfandango/haku_x/GpuDriverHelper.kt
+@@ -11,6 +11,8 @@ import java.io.File
+ import java.io.FileOutputStream
+ import java.io.IOException
+ import java.util.zip.ZipFile
++import java.security.MessageDigest
++import com.rfandango.haku_x.data.AppPrefs
+ 
+ /**
+  * Custom Vulkan drivers (adrenotools packages: a ZIP with meta.json and the driver library, such as
+@@ -30,10 +32,37 @@ object GpuDriverHelper {
+   val driverStorageDir: String get() = appContext.getExternalFilesDir(null)!!.absolutePath + "/gpu_drivers/"
+   val hookLibDir: String get() = appContext.applicationInfo.nativeLibraryDir + "/"
+ 
++  @Synchronized
+   fun init(context: Context) {
+     appContext = context.applicationContext
+     File(driverInstallDir).mkdirs()
+     File(driverStorageDir).mkdirs()
++    installSpikeoutDriverOnce()
++  }
++
++  /** Spikeout KR v0.8: the same R8 driver used on the tested Adreno 740. */
++  private fun installSpikeoutDriverOnce() {
++    val prefs = appContext.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
++    if (prefs.getBoolean("spikeout_r8_v08_installed", false)) return
++    if (!supportsCustomDriverLoading()) return
++    try {
++      val bytes = appContext.assets.open("spikeout/Turnip_v26.0.0_R8.zip").use { it.readBytes() }
++      val digest = MessageDigest.getInstance("SHA-256").digest(bytes)
++        .joinToString("") { "%02x".format(it.toInt() and 255) }
++      check(digest == "e634db0f929e2205e95511c769071817d0390180ec72c8e690bc76375e813715")
++      val stored = File(driverStorageDir, "Turnip_v26.0.0_R8.zip")
++      stored.writeBytes(bytes)
++      if (!useDriver(stored)) return
++      val edit = prefs.edit().putBoolean("spikeout_r8_v08_installed", true)
++      if (!prefs.contains("console_timing")) edit.putBoolean("console_timing", false)
++      if (!prefs.contains("show_hitches")) edit.putBoolean("show_hitches", false)
++      if (!prefs.contains("render_scale")) edit.putInt("render_scale", 1)
++      if (!prefs.contains("console_network")) edit.putString("console_network", "off")
++      edit.apply()
++      Log.i(TAG, "Spikeout KR v0.8: installed bundled Turnip 26.0.0-R8")
++    } catch (e: Exception) {
++      Log.e(TAG, "Could not install bundled Spikeout driver", e)
++    }
+   }
+ 
+   fun supportsCustomDriverLoading(): Boolean {
+diff --git a/android/app/src/main/java/com/rfandango/haku_x/LauncherActivity.kt b/android/app/src/main/java/com/rfandango/haku_x/LauncherActivity.kt
+index fbc67c1ebb4f39cf68937b6fc25644014f99d4c3..99fda7e7a5ab45f649065a4d823afcd59fd5d1a1 100644
+--- a/android/app/src/main/java/com/rfandango/haku_x/LauncherActivity.kt
++++ b/android/app/src/main/java/com/rfandango/haku_x/LauncherActivity.kt
+@@ -35,6 +35,7 @@ import java.io.File
+ class LauncherActivity : ComponentActivity() {
+   override fun onCreate(savedInstanceState: Bundle?) {
+     super.onCreate(savedInstanceState)
++    GpuDriverHelper.init(this)
+     val prefs = AppPrefs(this)
+ 
+     val usableFolders = prefs.gamesFolders.filter { Storage.hasReadPermission(this, it) }
+diff --git a/android/app/src/main/java/com/rfandango/haku_x/NativeCoreActivity.kt b/android/app/src/main/java/com/rfandango/haku_x/NativeCoreActivity.kt
+index 93fc02fda19fbed37844d55dcf511d46fdbe8b21..44d431de1a29dc9cb0da22f8b971e99d97da2eeb 100644
+--- a/android/app/src/main/java/com/rfandango/haku_x/NativeCoreActivity.kt
++++ b/android/app/src/main/java/com/rfandango/haku_x/NativeCoreActivity.kt
+@@ -220,6 +220,7 @@ class NativeCoreActivity : SDLActivity(), InputManager.InputDeviceListener {
+   override fun getLibraries(): Array<String> = arrayOf("SDL3", "hakuxcore")
+ 
+   override fun getArguments(): Array<String> {
++    GpuDriverHelper.init(this)
+     val args = mutableListOf(discArg, hddDir().absolutePath)
+     /* the dashboard: C:\xboxdash.xbe with no disc (discArg "none") */
+     if (dashboard) args += "dash"
+@@ -291,7 +292,6 @@ class NativeCoreActivity : SDLActivity(), InputManager.InputDeviceListener {
+     args += "pads=%x".format(plugged)
+     /* The custom Vulkan driver installed in the settings (Turnip), loaded
+      * by the core through adrenotools; none: the system driver. */
+-    GpuDriverHelper.init(this)
+     val driverLib = GpuDriverHelper.getInstalledDriverLibrary()
+     if (!driverLib.isNullOrEmpty() && GpuDriverHelper.supportsCustomDriverLoading()) {
+       args += "vkdriver=${GpuDriverHelper.driverInstallDir}|$driverLib|${GpuDriverHelper.hookLibDir}"
+diff --git a/hw/xbox/hle/core/xbe.h b/hw/xbox/hle/core/xbe.h
+index 3e9617f75450f93947e8a14b669ec9392a24ca8f..1e9c358796fdd64ca583c1c43f38bd5b11470626 100644
+--- a/hw/xbox/hle/core/xbe.h
++++ b/hw/xbox/hle/core/xbe.h
+@@ -17,7 +17,7 @@
+ #define HLE_XBE_SEC_PRELOAD    0x02u
+ #define HLE_XBE_SEC_EXECUTABLE 0x04u
+ 
+-#define HLE_XBE_MAX_SECTIONS 256   /* Fable has 107 */
++#define HLE_XBE_MAX_SECTIONS 512   /* Spikeout Battle Street has 398. */
+ #define HLE_XBE_MAX_LIBS     48
+ 
+ typedef struct HleXbeSection {
+diff --git a/native/net/nat.c b/native/net/nat.c
+index 78b63ae36d620233a9936029771c05e3ab7e7b20..e0919259229298a15a623c21f13db23f8bc5fc5d 100644
+--- a/native/net/nat.c
++++ b/native/net/nat.c
+@@ -53,10 +53,10 @@ static int64_t now_ns(void)
+ 
+ /* ------------------------------------------------- libslirp's callbacks */
+ 
+-static slirp_ssize_t cb_send_packet(const void *buf, size_t len, void *opaque)
++static ssize_t cb_send_packet(const void *buf, size_t len, void *opaque)
+ {
+     nc_net_deliver(buf, len);
+-    return (slirp_ssize_t)len;
++    return (ssize_t)len;
+ }
+ 
+ static void cb_guest_error(const char *msg, void *opaque)

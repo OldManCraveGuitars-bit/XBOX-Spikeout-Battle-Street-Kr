@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "section_hashes_verified": 399,
+  "original_sections_payload_preserved_except_subtitle_calls": true,
+  "shared_counter_aliases_preserved": 174,
+  "x86_wrapper_executed": true,
+  "fade_cases_verified": 5,
+  "draw_calls_checked": 25,
+  "original_style_and_stack_preserved": true,
+  "menu_call_sites_unchanged": true,
+  "device_visual_verification": false,
+  "hakux_modified_1_3_parser": {
+    "section_limit": 512,
+    "file_sections": 399,
+    "parse_result": 0,
+    "loaded_sections": 399
+  }
+}

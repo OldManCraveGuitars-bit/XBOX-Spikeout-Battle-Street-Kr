@@ -1,0 +1,21 @@
+{
+  "upstream": "https://github.com/rfandango/hakuX",
+  "upstream_commit": "a90f01ee4629977b36a76175cbd781d383056293",
+  "native_section_limit": 512,
+  "android_package": "com.rfandango.haku_x.spikeoutqa",
+  "version_name": "1.3.0-spikeout-kr-v0.8",
+  "version_code": 10,
+  "driver_release": "https://github.com/K11MCH1/AdrenoToolsDrivers/releases/tag/v26.0.0-rc08",
+  "driver_package_sha256": "e634db0f929e2205e95511c769071817d0390180ec72c8e690bc76375e813715",
+  "driver_license": "Mesa MIT and file-specific licenses; upstream base e9a83d530cce",
+  "native_core_changed_since_working_device_test": false,
+  "new_driver_bootstrap_device_tested": false,
+  "build": {
+    "ndk": "30.0.16248370",
+    "jdk": "21.0.13+9",
+    "android_sdk": 36,
+    "build_tools": "36.1.0",
+    "cpu": "armv8.2-a+fp16+dotprod+rcpc"
+  },
+  "fex_commit": "52018bf46a8279b22bce738548ab3f40db467064"
+}

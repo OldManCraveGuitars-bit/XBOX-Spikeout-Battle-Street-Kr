@@ -1,0 +1,13 @@
+build/
+dist/
+__pycache__/
+*.pyc
+*.iso
+*.xbe
+*.sfd
+*.apk
+*.jks
+*.keystore
+local.properties
+key.properties
+*.partial-*

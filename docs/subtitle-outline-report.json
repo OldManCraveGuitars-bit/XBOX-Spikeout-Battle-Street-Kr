@@ -1,0 +1,25 @@
+{
+  "enabled": true,
+  "color": "black",
+  "approximate_border_pixels": 2,
+  "extra_black_draws": 4,
+  "preserves_original_final_draw": true,
+  "movie_and_story_dialogue_only": true,
+  "menus_unchanged": true,
+  "native_function": "0x223150",
+  "call_sites": [
+    "0x152509",
+    "0x15274d",
+    "0x152e2f",
+    "0x152e61"
+  ],
+  "section_name": ".kosub",
+  "section_va": 6451200,
+  "section_raw": 6246400,
+  "section_size": 208,
+  "section_count": 399,
+  "relocated_shared_page_counters": 28,
+  "header_size": 28080,
+  "code_sha256": "123497535ecf34f00b5c624b60288bf4fdf5e81190fbdc73fff6113fb73903a1",
+  "mobile_visual_verification": false
+}

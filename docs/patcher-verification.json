@@ -1,0 +1,61 @@
+{
+  "passed": true,
+  "executable_checks": [
+    {
+      "name": "exe-raw-source",
+      "exit_code": 0,
+      "result": {
+        "version": "v0.8",
+        "size": 1168506880,
+        "source_sha256": "8e1784cb2baebf659e191c92e57574c1c13395ab77faed6b1133cf77f0288ecb",
+        "target_sha256": "81d13c30379430e11d819f27441b63b2c9702247e2c3bd7096a69ab78a3cb7da",
+        "source_files_verified": 6316,
+        "patch_files_verified": 14,
+        "source_preserved": true
+      }
+    },
+    {
+      "name": "exe-compact-source",
+      "exit_code": 0,
+      "result": {
+        "version": "v0.8",
+        "size": 1168506880,
+        "source_sha256": "08fb21d276b81315a656c33dc27e9fa30315a4b1a8c6dbece247a0b5d96988a4",
+        "target_sha256": "81d13c30379430e11d819f27441b63b2c9702247e2c3bd7096a69ab78a3cb7da",
+        "source_files_verified": 6316,
+        "patch_files_verified": 14,
+        "source_preserved": true
+      }
+    },
+    {
+      "name": "exe-reject-existing-output",
+      "exit_code": 1,
+      "result": {
+        "passed": false,
+        "error": "저장할 파일이 이미 있습니다. 다른 파일 이름을 선택해주세요."
+      }
+    },
+    {
+      "name": "exe-reject-patched-source",
+      "exit_code": 1,
+      "result": {
+        "passed": false,
+        "error": "원본 파일의 크기가 다릅니다: Default.xbe"
+      }
+    },
+    {
+      "name": "exe-reject-invalid-source",
+      "exit_code": 1,
+      "result": {
+        "passed": false,
+        "error": "Xbox ISO/XISO 형식을 찾지 못했습니다."
+      }
+    }
+  ],
+  "all_output_images_sha256": "81d13c30379430e11d819f27441b63b2c9702247e2c3bd7096a69ab78a3cb7da",
+  "source_images_opened_read_only": true,
+  "existing_destination_preserved": true,
+  "gui_window_opened": true,
+  "gui_visual_capture_unavailable": true,
+  "full_gameplay_completion_verified": false
+}
